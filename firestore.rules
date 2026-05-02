@@ -1,0 +1,21 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /questions/{questionId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /responses/{responseId} {
+      allow read: if true;
+      allow create: if request.resource.data.usn is string;
+      allow update: if false;
+    }
+
+    match /users/{usn} {
+      allow read: if true;
+      allow create, update: if request.resource.data.usn == usn;
+    }
+  }
+}

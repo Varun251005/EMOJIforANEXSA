@@ -1,62 +1,51 @@
-# Emoji Explanation Challenge Platform
+# 🎯 Emoji Explanation Challenge Platform
 
-Full-stack React + Firebase app for the Emoji Explanation challenge.
+A time-bound web application where users explain technical concepts using emojis and a short explanation.
 
-## Firestore data model
+---
 
-### questions (collection)
-Documents should be ordered by the numeric `order` field.
+## 📌 Description
 
-Example document:
+The Emoji Explanation Challenge Platform is an interactive web app designed to test creativity and technical understanding.  
+Participants interpret given technical terms using emojis (max 5) along with a one-line explanation within a fixed time limit.
 
-```
-{
-	"text": "API rate limiting",
-	"order": 1
-}
-```
+---
 
-### responses (collection)
-Each response is stored as its own document with the participant USN.
+## 🚀 Features
 
-Example document:
+- 🔐 Login using USN (no password required)
+- ⏱️ 60-second timer per question
+- 😀 Emoji-based answers (max 5 emojis)
+- ✍️ One-line explanation input
+- ⚡ Auto-submit when time runs out
+- 🔄 Questions displayed one by one
+- 🚫 Prevent multiple attempts
+- ☁️ Data stored in Firebase Firestore
+- 🧑‍💻 Admin panel to view responses
 
-```
-{
-	"usn": "1AB23CS456",
-	"questionId": "<question_doc_id>",
-	"questionText": "API rate limiting",
-	"order": 1,
-	"emojis": "🛑 ⏱️",
-	"explanation": "Limits calls per time window",
-	"timeTaken": 18,
-	"timestamp": "<serverTimestamp>",
-	"autoSubmit": false
-}
-```
+---
 
-### users (collection)
-Document ID is the participant USN (uppercase). Stores attempt metadata.
+## 🧠 How It Works
 
-Example document:
+1. User enters their USN to log in  
+2. Reads the challenge rules  
+3. Starts the challenge  
+4. Each question appears with a 60-second timer  
+5. User submits:
+   - Emojis (max 5)
+   - One-line explanation  
+6. If time ends → answer auto-submitted  
+7. System moves to next question  
+8. After completion → responses are stored in database  
 
-```
-{
-	"usn": "1AB23CS456",
-	"startedAt": "<serverTimestamp>",
-	"lastUpdatedAt": "<serverTimestamp>",
-	"hasCompleted": true,
-	"completedAt": "<serverTimestamp>"
-}
-```
+---
 
-## Firestore rules
+## 🛠️ Tech Stack
 
-`firestore.rules` is included with permissive read access for the admin panel and no Firebase Auth. Adjust before production.
+- ⚛️ React (Frontend)
+- 🔥 Firebase Firestore (Database)
+- 🌐 Firebase Hosting
+- 🧩 React Router DOM
 
-## Run locally
+---
 
-```
-npm install
-npm run dev
-```

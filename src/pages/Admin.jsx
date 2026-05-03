@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
 
@@ -84,6 +86,105 @@ const Admin = () => {
     setPassword('')
   }
 
+  const handleExportPdf = async () => {
+    if (responses.length === 0) {
+      return
+    }
+
+    const exportContainer = document.createElement('div')
+    exportContainer.style.position = 'fixed'
+    exportContainer.style.left = '-10000px'
+    exportContainer.style.top = '0'
+    exportContainer.style.width = '794px'
+    exportContainer.style.padding = '32px'
+    exportContainer.style.background = '#ffffff'
+    exportContainer.style.color = '#0f172a'
+    exportContainer.style.fontFamily =
+      '"Noto Color Emoji", "Segoe UI Emoji", "Apple Color Emoji", "Segoe UI Symbol", Arial, sans-serif'
+    exportContainer.style.fontSize = '14px'
+
+    const heading = document.createElement('h1')
+    heading.textContent = 'EmojiDecode Responses'
+    heading.style.margin = '0 0 8px'
+    heading.style.fontSize = '22px'
+    exportContainer.appendChild(heading)
+
+    const timestamp = document.createElement('p')
+    timestamp.textContent = `Exported: ${new Date().toLocaleString()}`
+    timestamp.style.margin = '0 0 24px'
+    timestamp.style.fontSize = '12px'
+    exportContainer.appendChild(timestamp)
+
+    responses.forEach((entry) => {
+      const entryHeader = document.createElement('h2')
+      entryHeader.textContent = `${entry.usn}${entry.name ? ` - ${entry.name}` : ''}`
+      entryHeader.style.margin = '16px 0 8px'
+      entryHeader.style.fontSize = '16px'
+      exportContainer.appendChild(entryHeader)
+
+      const responseList = document.createElement('ol')
+      responseList.style.margin = '0 0 16px 18px'
+      responseList.style.padding = '0'
+
+      entry.responses.forEach((response, index) => {
+        const item = document.createElement('li')
+        item.style.marginBottom = '10px'
+
+        const question = document.createElement('div')
+        question.textContent = `${index + 1}. ${response.questionText || 'Question'}`
+        question.style.fontWeight = '600'
+        question.style.marginBottom = '4px'
+        item.appendChild(question)
+
+        const emojiLine = document.createElement('div')
+        emojiLine.textContent = `Emojis: ${response.emojis || '—'}`
+        emojiLine.style.marginBottom = '4px'
+        item.appendChild(emojiLine)
+
+        const explanation = document.createElement('div')
+        explanation.textContent = `Explanation: ${response.explanation || 'No explanation'}`
+        explanation.style.color = '#475569'
+        item.appendChild(explanation)
+
+        responseList.appendChild(item)
+      })
+
+      exportContainer.appendChild(responseList)
+    })
+
+    document.body.appendChild(exportContainer)
+
+    try {
+      const canvas = await html2canvas(exportContainer, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+      })
+      const imgData = canvas.toDataURL('image/png')
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' })
+      const pageWidth = doc.internal.pageSize.getWidth()
+      const pageHeight = doc.internal.pageSize.getHeight()
+      const imgWidth = pageWidth
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+      let heightLeft = imgHeight
+      let position = 0
+
+      doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+      heightLeft -= pageHeight
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight
+        doc.addPage()
+        doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+        heightLeft -= pageHeight
+      }
+
+      doc.save('emoji-responses.pdf')
+    } finally {
+      document.body.removeChild(exportContainer)
+    }
+  }
+
   if (!isAuthed) {
     return (
       <section className="page">
@@ -144,9 +245,19 @@ const Admin = () => {
         <p className="eyebrow">Admin</p>
         <div className="admin-entry-header">
           <h1>All responses</h1>
-          <button className="btn ghost" type="button" onClick={handleLogout}>
-            Log out
-          </button>
+          <div className="admin-actions">
+            <button
+              className="btn ghost"
+              type="button"
+              onClick={handleExportPdf}
+              disabled={responses.length === 0}
+            >
+              Export PDF
+            </button>
+            <button className="btn ghost" type="button" onClick={handleLogout}>
+              Log out
+            </button>
+          </div>
         </div>
         <div className="admin-grid">
           {responses.length === 0 ? (

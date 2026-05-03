@@ -398,6 +398,12 @@
   gap: 12px;
 }
 
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .admin-usn,
 .admin-name {
   font-weight: 700;

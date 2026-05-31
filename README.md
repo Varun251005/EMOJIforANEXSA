@@ -47,7 +47,7 @@ Participants interpret given technical terms using emojis (max 5) along with a o
 - ⚛️ React (Frontend)
 - 🔥 Firebase Firestore (Database)
 - 🌐 Firebase Hosting
-- 🧩 React Router DOM
+- 🧩 React Router DOM 
 
 ---
 

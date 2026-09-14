@@ -3,6 +3,8 @@
 A time-bound web application where users explain technical concepts using emojis and a short explanation.
 
 Last updated: May 7, 2026.
+https://emojiexplanation.web.app/
+
 
 ---
 
